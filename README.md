@@ -59,6 +59,30 @@ celery -A config worker -l info
 celery -A config beat -l info
 ```
 
+## Despliegue rapido en tu VPS actual
+
+Proyecto desplegado en:
+
+```bash
+/home/qvatel/qvatel_billing
+```
+
+Para actualizar el VPS despues de hacer `git push`:
+
+```bash
+cd /home/qvatel/qvatel_billing
+chmod +x scripts/deploy_vps.sh
+./scripts/deploy_vps.sh
+```
+
+El script hace esto:
+
+- `git pull --ff-only`
+- instala dependencias
+- ejecuta migraciones
+- ejecuta `collectstatic`
+- reinicia `gunicorn`, `celery`, `celery beat` y `nginx`
+
 ## Endpoints REST principales
 
 - `/api/customers/`

@@ -12,6 +12,7 @@ media/
 staticfiles/
 
 celerybeat-schedule
+celerybeat-schedule.db
 celerybeat-schedule.bak
 celerybeat-schedule.dat
 celerybeat-schedule.dir
@@ -26,4 +27,3 @@ Thumbs.db
 desktop.ini
 
 *.log
-
