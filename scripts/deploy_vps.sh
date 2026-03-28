@@ -13,6 +13,9 @@ if [ ! -d "$VENV_DIR" ]; then
   exit 1
 fi
 
+echo "==> Validando permisos sudo"
+sudo -v
+
 echo "==> Trayendo cambios desde GitHub"
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes' git pull --ff-only
 
