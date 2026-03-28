@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Nueva Factura{% endblock %}
+{% block page_title %}Crear Factura{% endblock %}
+{% block content %}
+<form method="post" class="mt-4">
+    {% csrf_token %}
+    <div class="card card-soft mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                {% for field in form %}
+                    <div class="col-md-4">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="card card-soft">
+        <div class="card-header">Items de factura</div>
+        <div class="card-body">
+            {{ formset.management_form }}
+            <div class="row g-3">
+                {% for item_form in formset %}
+                    <div class="col-12 border-bottom pb-3">
+                        <div class="row g-2">
+                            {% for field in item_form.visible_fields %}
+                                <div class="col-md-3">
+                                    <label class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary" type="submit">Guardar factura</button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

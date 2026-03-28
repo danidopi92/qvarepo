@@ -1,0 +1,46 @@
+{% extends "portal/base.html" %}
+{% block title %}Acceso al portal | QvaTel{% endblock %}
+{% block content %}
+<section class="portal-access-card">
+    <div class="portal-access-copy">
+        <span class="eyebrow">Portal cliente</span>
+        <h1>Consulta tu plan, fecha de cobro y saldo pendiente</h1>
+        <p>Ingresa con tu código o documento y el teléfono registrado para ver tu servicio, tus facturas y tus pagos recientes.</p>
+        <ul class="portal-feature-list">
+            <li>Ver estado del servicio</li>
+            <li>Consultar monto pendiente</li>
+            <li>Revisar últimos pagos registrados</li>
+        </ul>
+    </div>
+    <div class="card card-soft portal-form-card">
+        <div class="card-body p-4">
+            <h3 class="mb-3">Acceder</h3>
+            <p class="text-secondary">Usa este acceso rápido si todavía no has creado tu cuenta del portal.</p>
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.identifier.id_for_label }}">{{ form.identifier.label }}</label>
+                    {{ form.identifier }}
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                </div>
+                {% if form.non_field_errors %}
+                    <div class="col-12">
+                        <div class="alert alert-danger mb-0">{{ form.non_field_errors }}</div>
+                    </div>
+                {% endif %}
+                <div class="col-12">
+                    <button class="btn btn-primary w-100" type="submit">Entrar al portal</button>
+                </div>
+                <div class="col-12 text-center">
+                    <a class="text-decoration-none" href="{% url 'portal-login' %}">Ya tengo cuenta</a>
+                    <span class="text-secondary mx-2">|</span>
+                    <a class="text-decoration-none" href="{% url 'portal-register' %}">Crear cuenta nueva</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Marca e identidad | QvaTel{% endblock %}
+{% block page_title %}Marca e identidad{% endblock %}
+{% block content %}
+<div class="row g-4 mt-4">
+    <div class="col-lg-4">
+        <div class="card card-soft">
+            <div class="card-header">Vista actual</div>
+            <div class="card-body text-center">
+                {% if system_company.logo %}
+                    <img src="{{ system_company.logo.url }}" alt="Logo" class="img-fluid rounded mb-3" style="max-height: 140px;">
+                {% else %}
+                    <div class="brand-preview mx-auto mb-3">Q</div>
+                {% endif %}
+                <h4>{{ system_company.name }}</h4>
+                <div class="text-secondary">{{ system_company.legal_name }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="card card-soft mb-4">
+                <div class="card-header">Empresa y logo</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for field in company_form %}
+                            <div class="col-md-6">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}<div class="text-danger small">{{ field.errors|join:", " }}</div>{% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="card card-soft">
+                <div class="card-header">Parámetros del sistema</div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for field in system_form %}
+                            <div class="col-md-6">
+                                <label class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}<div class="text-danger small">{{ field.errors|join:", " }}</div>{% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-4">
+                        <button class="btn btn-primary" type="submit">Guardar ajustes</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

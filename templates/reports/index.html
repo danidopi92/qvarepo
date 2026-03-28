@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Reportes{% endblock %}
+{% block page_title %}Reportes{% endblock %}
+{% block content %}
+<div class="row g-3 mt-4">
+    <div class="col-md-6">
+        <div class="card card-soft">
+            <div class="card-body">
+                <h5>Clientes morosos</h5>
+                <p class="display-6">{{ debtor_count }}</p>
+                <a class="btn btn-outline-primary" href="{% url 'report-debtors-csv' %}">Exportar CSV</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-soft">
+            <div class="card-body">
+                <h5>Ingresos</h5>
+                <p class="display-6">{{ month_income }}</p>
+                <a class="btn btn-outline-primary" href="{% url 'report-income-excel' %}">Exportar Excel</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mt-4">
+    <a class="btn btn-outline-secondary" href="{% url 'report-customers-csv' %}">Exportar clientes CSV</a>
+</div>
+{% endblock %}

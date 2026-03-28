@@ -1,0 +1,60 @@
+{% extends "portal/base.html" %}
+{% block title %}Recuperar contraseña | QvaTel{% endblock %}
+{% block content %}
+<section class="portal-access-card">
+    <div class="portal-access-copy">
+        <span class="eyebrow">Recuperación</span>
+        <h1>Recupera tu contraseña del portal</h1>
+        <p>Para proteger la cuenta te pedimos validar tu cliente con código o documento, teléfono registrado y correo del portal.</p>
+        <ul class="portal-feature-list">
+            <li>Se valida contra tu ficha real de cliente</li>
+            <li>No necesitas salir del portal</li>
+            <li>La nueva contraseña queda activa al instante</li>
+        </ul>
+    </div>
+    <div class="card card-soft portal-form-card">
+        <div class="card-body p-4">
+            <h3 class="mb-3">Actualizar contraseña</h3>
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.identifier.id_for_label }}">{{ form.identifier.label }}</label>
+                    {{ form.identifier }}
+                    {% if form.identifier.errors %}<div class="text-danger small mt-1">{{ form.identifier.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.email_login.id_for_label }}">{{ form.email_login.label }}</label>
+                    {{ form.email_login }}
+                    {% if form.email_login.errors %}<div class="text-danger small mt-1">{{ form.email_login.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors|join:", " }}</div>{% endif %}
+                </div>
+                {% if form.non_field_errors %}
+                    <div class="col-12">
+                        <div class="alert alert-danger mb-0">{{ form.non_field_errors }}</div>
+                    </div>
+                {% endif %}
+                <div class="col-12">
+                    <button class="btn btn-primary w-100" type="submit">Guardar nueva contraseña</button>
+                </div>
+                <div class="col-12 text-center">
+                    <a class="text-decoration-none" href="{% url 'portal-login' %}">Volver al inicio de sesión</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

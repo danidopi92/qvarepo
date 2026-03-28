@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Planes de internet | QvaTel{% endblock %}
+{% block page_title %}Planes de Servicio{% endblock %}
+{% block content %}
+<section class="hero-panel mt-4">
+    <div>
+        <h3 class="mb-2">Catálogo de planes comerciales</h3>
+        <p class="mb-0 text-secondary">Crea y ajusta los planes de internet y otros servicios sin tocar la operación diaria de los clientes.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a class="btn btn-primary" href="{% url 'settings-service-plan-create' %}?service_type=internet">Nuevo plan de internet</a>
+        <a class="btn btn-outline-primary" href="{% url 'settings-service-plan-create' %}">Nuevo plan</a>
+    </div>
+</section>
+
+<div class="toolbar mt-4">
+    <form class="row g-2">
+        <div class="col-lg-5">
+            <input class="form-control" type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nombre del plan">
+        </div>
+        <div class="col-lg-3">
+            <select class="form-select" name="service_type">
+                <option value="">Todos los tipos</option>
+                {% for value, label in service_type_choices %}
+                    <option value="{{ value }}" {% if request.GET.service_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-lg-4 d-flex justify-content-lg-end gap-2">
+            <button class="btn btn-outline-secondary" type="submit">Filtrar</button>
+            <a class="btn btn-outline-secondary" href="{% url 'settings-service-plans' %}">Limpiar</a>
+        </div>
+    </form>
+</div>
+
+<div class="card card-soft mt-3">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Plan</th>
+                    <th>Tipo</th>
+                    <th>Velocidad</th>
+                    <th>Precio mensual</th>
+                    <th>Recurrencia</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for plan in plans %}
+                <tr>
+                    <td>
+                        <div class="fw-semibold">{{ plan.name }}</div>
+                        <div class="text-secondary small">{{ plan.description|default:"Sin descripción" }}</div>
+                    </td>
+                    <td><span class="status-pill status-pending">{{ plan.get_service_type_display }}</span></td>
+                    <td>{{ plan.speed_label|default:"-" }}</td>
+                    <td>{{ plan.monthly_price }}</td>
+                    <td>
+                        {% if plan.is_recurring %}
+                            <span class="status-pill status-active">Mensual</span>
+                        {% else %}
+                            <span class="status-pill status-suspended">No recurrente</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'settings-service-plan-update' plan.pk %}">Editar</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="fw-semibold">No hay planes creados.</div>
+                        <div class="text-secondary small mt-1">Empieza creando tus planes de internet para reutilizarlos al asignar servicios.</div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

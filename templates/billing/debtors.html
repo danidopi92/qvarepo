@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Morosos{% endblock %}
+{% block page_title %}Clientes Morosos{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mt-4">
+    <a class="btn btn-outline-primary" href="{% url 'report-debtors-csv' %}">Exportar CSV</a>
+</div>
+<div class="card card-soft mt-3">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Cliente</th><th>Factura</th><th>Vence</th><th>Saldo</th></tr></thead>
+            <tbody>
+            {% for invoice in invoices %}
+                <tr><td>{{ invoice.customer.full_name }}</td><td>{{ invoice.invoice_number }}</td><td>{{ invoice.due_date }}</td><td>{{ invoice.balance_due }}</td></tr>
+            {% empty %}
+                <tr><td colspan="4">Sin morosos.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Facturas{% endblock %}
+{% block page_title %}Facturación{% endblock %}
+{% block content %}
+<section class="summary-strip mt-4">
+    <div class="summary-chip"><span>Facturas</span><strong>{{ invoice_summary.count }}</strong></div>
+    <div class="summary-chip"><span>Total emitido</span><strong>{{ invoice_summary.total }}</strong></div>
+    <div class="summary-chip"><span>Saldo pendiente</span><strong>{{ invoice_summary.pending }}</strong></div>
+</section>
+<div class="toolbar mt-4">
+    <form class="row g-2">
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por número de factura o cliente">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="status">
+                <option value="">Todos los estados</option>
+                {% for key, value in invoice_statuses %}
+                    <option value="{{ key }}" {% if request.GET.status == key %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 d-flex justify-content-md-end">
+            <button class="btn btn-outline-secondary" type="submit">Filtrar</button>
+        </div>
+    </form>
+</div>
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <div class="d-flex gap-2">
+        <a class="btn btn-primary" href="{% url 'invoice-create' %}">Nueva factura</a>
+        <form method="post" action="{% url 'invoice-generate-monthly' %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-primary" type="submit">Generar mensual</button>
+        </form>
+    </div>
+    <a class="btn btn-outline-secondary" href="{% url 'debtors-report' %}">Ver morosos</a>
+</div>
+<div class="card card-soft mt-3">
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead><tr><th>Número</th><th>Cliente</th><th>Emisión</th><th>Vence</th><th>Total</th><th>Saldo</th><th>Estado</th></tr></thead>
+            <tbody>
+            {% for invoice in invoices %}
+                <tr>
+                    <td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.invoice_number }}</a></td>
+                    <td>{{ invoice.customer.full_name }}</td>
+                    <td>{{ invoice.issue_date }}</td>
+                    <td>{{ invoice.due_date }}</td>
+                    <td>{{ invoice.total_amount }}</td>
+                    <td>{{ invoice.balance_due }}</td>
+                    <td><span class="status-pill status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7">Sin facturas.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Servicio{% endblock %}
+{% block page_title %}Servicio del Cliente{% endblock %}
+{% block content %}
+<div class="card card-soft mt-4">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                {% for field in form %}
+                    <div class="col-md-6">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="text-danger small">{{ field.errors|join:", " }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="mt-4">
+                <button class="btn btn-primary" type="submit">Guardar servicio</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

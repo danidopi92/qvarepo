@@ -1,0 +1,31 @@
+{% extends "portal/base.html" %}
+{% block title %}Mis pagos | QvaTel{% endblock %}
+{% block content %}
+<section class="portal-section-heading">
+    <div>
+        <span class="eyebrow">Portal cliente</span>
+        <h1>Mis pagos</h1>
+        <p class="text-secondary mb-0">Aqui ves tus pagos registrados, el metodo usado y cualquier referencia asociada.</p>
+    </div>
+</section>
+<div class="card card-soft mt-4">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead><tr><th>Fecha</th><th>Monto</th><th>Metodo</th><th>Moneda</th><th>Referencia</th></tr></thead>
+            <tbody>
+            {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.paid_at|date:"Y-m-d H:i" }}</td>
+                    <td>{{ payment.amount }}</td>
+                    <td>{{ payment.get_method_display }}</td>
+                    <td>{{ payment.currency.code }}</td>
+                    <td>{{ payment.reference|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">No hay pagos registrados.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

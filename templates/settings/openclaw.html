@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}OpenClaw | QvaTel{% endblock %}
+{% block page_title %}Configuración de OpenClaw{% endblock %}
+{% block content %}
+<section class="summary-strip mt-4">
+    <div class="summary-chip"><span>Base URL</span><strong>{{ openclaw.base_url }}</strong></div>
+    <div class="summary-chip"><span>Timeout</span><strong>{{ openclaw.timeout }} s</strong></div>
+    <div class="summary-chip"><span>Reintentos</span><strong>{{ openclaw.retry_attempts }}</strong></div>
+    <div class="summary-chip"><span>Modo</span><strong>{% if openclaw.simulation_mode %}Simulacion{% else %}Produccion{% endif %}</strong></div>
+</section>
+<div class="card card-soft mt-4">
+    <div class="card-header">Credenciales y estado</div>
+    <div class="card-body">
+        <p><strong>API key:</strong> {{ openclaw.api_key_masked }}</p>
+        <p class="text-secondary mb-0">La configuración activa de OpenClaw se toma desde variables de entorno. Este panel sirve para inspección operativa y acceso rápido a eventos.</p>
+    </div>
+</div>
+<div class="card card-soft mt-4">
+    <div class="card-header">Eventos recientes</div>
+    <div class="card-body">
+        <table class="table table-sm align-middle mb-0">
+            <thead><tr><th>Fecha</th><th>Accion</th><th>Cliente</th><th>Estado</th></tr></thead>
+            <tbody>
+            {% for event in recent_events %}
+                <tr>
+                    <td>{{ event.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>{{ event.action }}</td>
+                    <td>{{ event.customer.full_name|default:"-" }}</td>
+                    <td>{% if event.success %}<span class="status-pill status-active">OK</span>{% else %}<span class="status-pill status-suspended">Error</span>{% endif %}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4">Sin eventos recientes.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

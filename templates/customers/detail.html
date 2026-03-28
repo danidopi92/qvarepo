@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}{{ customer.full_name }} | QvaTel{% endblock %}
+{% block page_title %}{{ customer.full_name }}{% endblock %}
+{% block content %}
+<section class="summary-strip mt-4">
+    <div class="summary-chip"><span>Servicios</span><strong>{{ customer_summary.services_count }}</strong></div>
+    <div class="summary-chip"><span>Servicios activos</span><strong>{{ customer_summary.active_services }}</strong></div>
+    <div class="summary-chip"><span>Facturas vencidas</span><strong>{{ customer_summary.overdue_invoices }}</strong></div>
+    <div class="summary-chip"><span>Saldo pendiente</span><strong>{{ customer_summary.pending_balance }}</strong></div>
+</section>
+<div class="row mt-4 g-4">
+    <div class="col-lg-4">
+        <div class="card card-soft">
+            <div class="card-header">Datos generales</div>
+            <div class="card-body">
+                <p><strong>Documento:</strong> {{ customer.document_id|default:"-" }}</p>
+                <p><strong>Teléfono:</strong> {{ customer.phone|default:"-" }}</p>
+                <p><strong>WhatsApp:</strong> {{ customer.whatsapp|default:"-" }}</p>
+                <p><strong>Email:</strong> {{ customer.email|default:"-" }}</p>
+                <p><strong>Nodo:</strong> {% if customer.node %}{{ customer.node.name }}{% else %}-{% endif %}</p>
+                <p><strong>IP:</strong> {{ customer.assigned_ip|default:"-" }}</p>
+                <p><strong>Plan principal:</strong> {% if primary_service %}{{ primary_service.plan.name }}{% else %}-{% endif %}</p>
+                <p><strong>Día de pago:</strong> {{ customer.payment_day|default:"-" }}</p>
+                <p><strong>Tipo de pago:</strong> {{ customer.get_preferred_payment_method_display|default:"-" }}</p>
+                <p><strong>Estado:</strong> {{ customer.get_status_display }}</p>
+                <p><strong>Dirección:</strong> {{ customer.address|default:"-" }}</p>
+                <div class="d-flex gap-2 mt-3">
+                    <a class="btn btn-sm btn-primary" href="{% url 'service-create' %}?customer={{ customer.pk }}">Agregar servicio</a>
+                    <a class="btn btn-sm btn-outline-dark" href="{% url 'invoice-create' %}?customer={{ customer.pk }}">Crear factura</a>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'payment-create' %}?customer={{ customer.pk }}">Registrar pago</a>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                    <form method="post" action="{% url 'customer-suspend' customer.pk %}">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-danger">Suspender</button>
+                    </form>
+                    <form method="post" action="{% url 'customer-reactivate' customer.pk %}">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-success">Reactivar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card card-soft mt-4">
+            <div class="card-header">Acceso portal cliente</div>
+            <div class="card-body">
+                <p class="mb-2">
+                    <strong>Cuenta portal:</strong>
+                    {% if portal_account %}
+                        <span class="status-pill {% if portal_account.is_active %}status-active{% else %}status-suspended{% endif %}">
+                            {% if portal_account.is_active %}Activa{% else %}Bloqueada{% endif %}
+                        </span>
+                    {% else %}
+                        <span class="status-pill status-pending">Sin registrar</span>
+                    {% endif %}
+                </p>
+                <p class="mb-2"><strong>Correo portal:</strong> {% if portal_account %}{{ portal_account.email_login }}{% else %}-{% endif %}</p>
+                <p class="mb-2"><strong>Último acceso:</strong> {% if portal_account and portal_account.last_login_at %}{{ portal_account.last_login_at }}{% else %}-{% endif %}</p>
+                <p class="mb-2"><strong>Código recomendado:</strong> <span class="text-break">{{ portal_access.recommended_code }}</span></p>
+                <p class="mb-2"><strong>Acceso manual:</strong> <a href="{{ portal_access.manual_url }}" target="_blank">{{ portal_access.manual_url }}</a></p>
+                <p class="mb-3"><strong>Enlace seguro:</strong> <a href="{{ portal_access.secure_url }}" target="_blank">Abrir portal seguro</a></p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary js-copy-trigger" type="button" data-copy-text="{{ portal_access.recommended_code }}">Copiar código</button>
+                    <button class="btn btn-sm btn-outline-primary js-copy-trigger" type="button" data-copy-text="{{ portal_access.secure_url }}">Copiar enlace seguro</button>
+                    <button class="btn btn-sm btn-outline-primary js-copy-trigger" type="button" data-copy-text="{{ portal_access.invite_url }}">Copiar invitación</button>
+                    <a class="btn btn-sm btn-primary" href="{{ portal_access.secure_url }}" target="_blank">Probar portal</a>
+                    {% if portal_access.whatsapp_url %}
+                        <a class="btn btn-sm btn-outline-success" href="{{ portal_access.whatsapp_url }}" target="_blank">Enviar por WhatsApp</a>
+                    {% else %}
+                        <button class="btn btn-sm btn-outline-success" type="button" disabled>Sin WhatsApp</button>
+                    {% endif %}
+                    {% if portal_access.email_url %}
+                        <a class="btn btn-sm btn-outline-dark" href="{{ portal_access.email_url }}">Enviar por correo</a>
+                    {% else %}
+                        <button class="btn btn-sm btn-outline-dark" type="button" disabled>Sin correo</button>
+                    {% endif %}
+                    {% if portal_access.invite_whatsapp_url %}
+                        <a class="btn btn-sm btn-success" href="{{ portal_access.invite_whatsapp_url }}" target="_blank">Enviar invitación por WhatsApp</a>
+                    {% else %}
+                        <button class="btn btn-sm btn-success" type="button" disabled>Invitación sin WhatsApp</button>
+                    {% endif %}
+                    {% if portal_access.invite_email_url %}
+                        <a class="btn btn-sm btn-dark" href="{{ portal_access.invite_email_url }}">Enviar invitación por correo</a>
+                    {% else %}
+                        <button class="btn btn-sm btn-dark" type="button" disabled>Invitación sin correo</button>
+                    {% endif %}
+                    {% if portal_account %}
+                        <form method="post" action="{% url 'customer-portal-account-toggle' customer.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-sm {% if portal_account.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" type="submit">
+                                {% if portal_account.is_active %}Bloquear cuenta portal{% else %}Activar cuenta portal{% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+                <p class="text-secondary small mt-3 mb-0">El enlace seguro entra directo al portal del cliente sin pedir código ni teléfono mientras no haya vencido. La invitación formal lleva al registro de cuenta del portal.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card card-soft mb-4">
+            <div class="card-header">Servicios</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Plan</th><th>Velocidad</th><th>Precio</th><th>Estado</th></tr></thead>
+                    <tbody>
+                    {% for service in services %}
+                        <tr><td>{{ service.plan.name }}</td><td>{{ service.speed_label|default:service.plan.speed_label }}</td><td>{{ service.monthly_price }}</td><td><span class="status-pill status-{{ service.status }}">{{ service.get_status_display }}</span></td></tr>
+                    {% empty %}
+                        <tr><td colspan="4">Sin servicios asociados.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card card-soft mb-4">
+            <div class="card-header">Facturas</div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead><tr><th>Número</th><th>Emisión</th><th>Vence</th><th>Saldo</th><th>Estado</th></tr></thead>
+                    <tbody>
+                    {% for invoice in invoices %}
+                        <tr><td><a href="{% url 'invoice-detail' invoice.pk %}">{{ invoice.invoice_number }}</a></td><td>{{ invoice.issue_date }}</td><td>{{ invoice.due_date }}</td><td>{{ invoice.balance_due }}</td><td><span class="status-pill status-{{ invoice.status }}">{{ invoice.get_status_display }}</span></td></tr>
+                    {% empty %}
+                        <tr><td colspan="5">Sin facturas.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card card-soft">
+            <div class="card-header">Historial</div>
+            <div class="card-body">
+                {% for item in timeline %}
+                    <div class="timeline-item">
+                        <div class="small text-secondary">{{ item.created_at }}</div>
+                        <div>
+                            {% if item.reason %}
+                                <strong>{{ item.get_action_display }}</strong>: {{ item.reason }}
+                            {% else %}
+                                <strong>Nota interna</strong>: {{ item.note }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="mb-0">Sin eventos recientes.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

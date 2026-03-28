@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Cliente | QvaTel{% endblock %}
+{% block page_title %}Ficha de Cliente{% endblock %}
+{% block content %}
+<div class="card card-soft mt-4">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+            <div>
+                <h4 class="mb-1">Datos del cliente</h4>
+                <p class="text-secondary mb-0">Completa la ficha comercial y operativa del cliente. El plan se asigna luego desde el módulo de servicios.</p>
+            </div>
+            <a class="btn btn-outline-secondary" href="{% url 'customer-list' %}">Volver al listado</a>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-4">
+                <div class="col-12">
+                    <h6 class="text-uppercase text-secondary small mb-3">Identificación y contacto</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.customer_type.id_for_label }}">{{ form.customer_type.label }}</label>
+                            {{ form.customer_type }}
+                            {% if form.customer_type.errors %}<div class="text-danger small">{{ form.customer_type.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label" for="{{ form.full_name.id_for_label }}">{{ form.full_name.label }}</label>
+                            {{ form.full_name }}
+                            {% if form.full_name.errors %}<div class="text-danger small">{{ form.full_name.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.document_id.id_for_label }}">{{ form.document_id.label }}</label>
+                            {{ form.document_id }}
+                            {% if form.document_id.errors %}<div class="text-danger small">{{ form.document_id.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}<div class="text-danger small">{{ form.phone.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.whatsapp.id_for_label }}">{{ form.whatsapp.label }}</label>
+                            {{ form.whatsapp }}
+                            {% if form.whatsapp.errors %}<div class="text-danger small">{{ form.whatsapp.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.tags.id_for_label }}">{{ form.tags.label }}</label>
+                            {{ form.tags }}
+                            {% if form.tags.errors %}<div class="text-danger small">{{ form.tags.errors|join:", " }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <h6 class="text-uppercase text-secondary small mb-3">Ubicación y red</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.address.id_for_label }}">{{ form.address.label }}</label>
+                            {{ form.address }}
+                            {% if form.address.errors %}<div class="text-danger small">{{ form.address.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ form.location_reference.id_for_label }}">{{ form.location_reference.label }}</label>
+                            {{ form.location_reference }}
+                            {% if form.location_reference.errors %}<div class="text-danger small">{{ form.location_reference.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.node.id_for_label }}">{{ form.node.label }}</label>
+                            {{ form.node }}
+                            {% if form.node.errors %}<div class="text-danger small">{{ form.node.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.assigned_ip.id_for_label }}">{{ form.assigned_ip.label }}</label>
+                            {{ form.assigned_ip }}
+                            {% if form.assigned_ip.errors %}<div class="text-danger small">{{ form.assigned_ip.errors|join:", " }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <h6 class="text-uppercase text-secondary small mb-3">Cobro y seguimiento</h6>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label" for="{{ form.payment_day.id_for_label }}">{{ form.payment_day.label }}</label>
+                            {{ form.payment_day }}
+                            {% if form.payment_day.errors %}<div class="text-danger small">{{ form.payment_day.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label" for="{{ form.preferred_payment_method.id_for_label }}">{{ form.preferred_payment_method.label }}</label>
+                            {{ form.preferred_payment_method }}
+                            {% if form.preferred_payment_method.errors %}<div class="text-danger small">{{ form.preferred_payment_method.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.service_plan.id_for_label }}">{{ form.service_plan.label }}</label>
+                            {{ form.service_plan }}
+                            {% if form.service_plan.errors %}<div class="text-danger small">{{ form.service_plan.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}<div class="text-danger small">{{ form.status.errors|join:", " }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="{{ form.internal_notes.id_for_label }}">{{ form.internal_notes.label }}</label>
+                            {{ form.internal_notes }}
+                            {% if form.internal_notes.errors %}<div class="text-danger small">{{ form.internal_notes.errors|join:", " }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Guardar</button>
+                <a class="btn btn-outline-secondary" href="{% url 'customer-list' %}">Volver</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

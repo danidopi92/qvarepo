@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Pagos{% endblock %}
+{% block page_title %}Pagos{% endblock %}
+{% block content %}
+<div class="toolbar mt-4">
+    <form class="row g-2">
+        <div class="col-md-5">
+            <input class="form-control" type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por cliente, factura o referencia">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="method">
+                <option value="">Todos los métodos</option>
+                {% for key, value in payment_methods %}
+                    <option value="{{ key }}" {% if request.GET.method == key %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 d-flex justify-content-md-end">
+            <button class="btn btn-outline-secondary" type="submit">Filtrar</button>
+        </div>
+    </form>
+</div>
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <a class="btn btn-primary" href="{% url 'payment-create' %}">Registrar pago</a>
+    <div class="small text-secondary">Pagos listados: {{ payment_count }} | Total del dia: {{ today_total }}</div>
+</div>
+<div class="card card-soft mt-3">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead><tr><th>Fecha</th><th>Cliente</th><th>Factura</th><th>Método</th><th>Monto</th><th>Referencia</th></tr></thead>
+            <tbody>
+            {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.paid_at }}</td>
+                    <td>{{ payment.customer.full_name }}</td>
+                    <td>{{ payment.invoice.invoice_number|default:"-" }}</td>
+                    <td>{{ payment.get_method_display }}</td>
+                    <td>{{ payment.amount }}</td>
+                    <td>{{ payment.reference|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6">Sin pagos registrados.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

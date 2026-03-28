@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ invoice.invoice_number }}{% endblock %}
+{% block page_title %}Factura {{ invoice.invoice_number }}{% endblock %}
+{% block content %}
+<div class="row mt-4 g-4">
+    <div class="col-lg-4">
+        <div class="card card-soft">
+            <div class="card-header">Resumen</div>
+            <div class="card-body">
+                <p><strong>Cliente:</strong> {{ invoice.customer.full_name }}</p>
+    <p><strong>Emisión:</strong> {{ invoice.issue_date }}</p>
+                <p><strong>Vence:</strong> {{ invoice.due_date }}</p>
+                <p><strong>Total:</strong> {{ invoice.total_amount }}</p>
+                <p><strong>Pagado:</strong> {{ invoice.amount_paid }}</p>
+                <p><strong>Saldo:</strong> {{ invoice.balance_due }}</p>
+                <p><strong>Estado:</strong> {{ invoice.get_status_display }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card card-soft">
+            <div class="card-header">Conceptos</div>
+            <div class="card-body">
+                <table class="table table-sm">
+            <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Total</th></tr></thead>
+                    <tbody>
+                    {% for item in invoice.items.all %}
+                        <tr><td>{{ item.description }}</td><td>{{ item.quantity }}</td><td>{{ item.unit_price }}</td><td>{{ item.line_total }}</td></tr>
+                    {% empty %}
+                        <tr><td colspan="4">Sin items.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

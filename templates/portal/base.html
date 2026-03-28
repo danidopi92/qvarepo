@@ -1,0 +1,70 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Portal Cliente | QvaTel{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{% static 'css/app.css' %}" rel="stylesheet">
+    <script defer src="{% static 'js/app.js' %}"></script>
+</head>
+<body class="portal-body">
+    <div class="portal-shell">
+        <header class="portal-header">
+            <a class="portal-brand" href="{% url 'portal-home' %}">
+                {% if system_company.logo %}
+                    <img src="{{ system_company.logo.url }}" alt="Logo" class="portal-brand-logo">
+                {% else %}
+                    <span class="portal-brand-mark">Q</span>
+                {% endif %}
+                <span>
+                    <strong>{{ system_company.name|default:"QvaTel" }}</strong>
+                    <small>Portal del cliente</small>
+                </span>
+            </a>
+            {% if portal_customer %}
+                <nav class="portal-nav">
+                    <a class="{% if request.resolver_match.url_name == 'portal-dashboard' %}active{% endif %}" href="{% url 'portal-dashboard' %}">Resumen</a>
+                    <a class="{% if request.resolver_match.url_name == 'portal-invoices' %}active{% endif %}" href="{% url 'portal-invoices' %}">Facturas</a>
+                    <a class="{% if request.resolver_match.url_name == 'portal-payments' %}active{% endif %}" href="{% url 'portal-payments' %}">Pagos</a>
+                    <form method="post" action="{% url 'portal-logout' %}">
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-light" type="submit">Salir</button>
+                    </form>
+                </nav>
+            {% else %}
+                <nav class="portal-nav">
+                    <a class="{% if request.resolver_match.url_name == 'portal-access' %}active{% endif %}" href="{% url 'portal-access' %}">Acceso rápido</a>
+                    <a class="{% if request.resolver_match.url_name == 'portal-login' %}active{% endif %}" href="{% url 'portal-login' %}">Iniciar sesión</a>
+                    <a class="{% if request.resolver_match.url_name == 'portal-register' %}active{% endif %}" href="{% url 'portal-register' %}">Crear cuenta</a>
+                    <a class="{% if request.resolver_match.url_name == 'portal-recover' %}active{% endif %}" href="{% url 'portal-recover' %}">Recuperar contraseña</a>
+                </nav>
+            {% endif %}
+        </header>
+        <main class="portal-main">
+            {% if messages %}
+                <div class="mb-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <button
+        class="theme-toggle"
+        type="button"
+        id="theme-toggle"
+        aria-label="Cambiar a modo oscuro"
+        title="Cambiar a modo oscuro">
+        <i class="bi bi-moon-stars-fill"></i>
+        <span>Modo oscuro</span>
+    </button>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Reportes | QvaTel{% endblock %}
+{% block page_title %}Accesos de Reportes{% endblock %}
+{% block content %}
+<section class="row g-4 mt-4">
+    <div class="col-md-4">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <h5>Morosos</h5>
+        <p class="text-secondary">Consulta deudores y exporta CSV para gestión de cobro.</p>
+                <a class="btn btn-primary" href="{% url 'debtors-report' %}">Abrir morosos</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <h5>Ingresos</h5>
+                <p class="text-secondary">Exporta pagos e ingresos del sistema en Excel.</p>
+                <a class="btn btn-primary" href="{% url 'report-income-excel' %}">Exportar ingresos</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <h5>Clientes</h5>
+                <p class="text-secondary">Descarga clientes y revisa la pantalla consolidada de reportes.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a class="btn btn-primary" href="{% url 'reports-home' %}">Abrir panel</a>
+                    <a class="btn btn-outline-primary" href="{% url 'report-customers-csv' %}">Exportar clientes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

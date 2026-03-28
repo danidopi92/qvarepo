@@ -1,0 +1,145 @@
+{% extends "portal/base.html" %}
+{% block title %}Mi resumen | QvaTel{% endblock %}
+{% block content %}
+<section class="portal-hero">
+    <div>
+        <span class="eyebrow">Hola, {{ portal_customer.full_name }}</span>
+        <h1 class="mb-2">Tu servicio y cobro en una sola vista</h1>
+        <p class="mb-0 text-secondary">Aqui puedes revisar tu plan actual, facturas pendientes, ultimos pagos y el estado de tu servicio.</p>
+    </div>
+    <div class="portal-status-card">
+        <div class="portal-status-label">Estado del cliente</div>
+        <div class="status-pill {% if portal_customer.status == 'active' %}status-active{% elif portal_customer.status == 'suspended' %}status-suspended{% else %}status-pending{% endif %}">
+            {{ portal_customer.get_status_display }}
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mt-1">
+    <div class="col-lg-3 col-sm-6">
+        <div class="metric-card">
+            <span>Saldo pendiente</span>
+            <strong>{{ portal_balance_total }}</strong>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="metric-card">
+            <span>Proximo vencimiento</span>
+            <strong>{% if portal_next_due_invoice %}{{ portal_next_due_invoice.due_date }}{% else %}Sin deuda{% endif %}</strong>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="metric-card">
+            <span>Plan principal</span>
+            <strong>{% if portal_primary_service %}{{ portal_primary_service.plan.name }}{% else %}Sin plan{% endif %}</strong>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="metric-card">
+            <span>Velocidad</span>
+            <strong>{% if portal_primary_service %}{{ portal_primary_service.speed_label|default:portal_primary_service.plan.speed_label|default:"-" }}{% else %}-{% endif %}</strong>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mt-2">
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <h4 class="mb-3">Tu servicio</h4>
+                {% if portal_primary_service %}
+                    <div class="portal-detail-grid">
+                        <div><span>Plan</span><strong>{{ portal_primary_service.plan.name }}</strong></div>
+                        <div><span>Tipo</span><strong>{{ portal_primary_service.get_service_type_display }}</strong></div>
+                        <div><span>Precio mensual</span><strong>{{ portal_primary_service.monthly_price }}</strong></div>
+                        <div>
+                            <span>Nodo</span>
+                            <strong>
+                                {% if portal_primary_service.node %}
+                                    {{ portal_primary_service.node.name }}
+                                {% elif portal_customer.node %}
+                                    {{ portal_customer.node.name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-secondary mb-0">No hay un servicio activo visible en este momento.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <h4 class="mb-3">Contacto y soporte</h4>
+                <div class="portal-detail-grid">
+                    <div><span>Teléfono registrado</span><strong>{{ portal_customer.phone|default:"-" }}</strong></div>
+                    <div><span>WhatsApp</span><strong>{{ portal_customer.whatsapp|default:"-" }}</strong></div>
+                    <div><span>Correo</span><strong>{{ portal_customer.email|default:"-" }}</strong></div>
+                    <div><span>Soporte QvaTel</span><strong>{{ system_company.phone|default:"Disponible por oficina" }}</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mt-2">
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Facturas pendientes</h4>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'portal-invoices' %}">Ver todas</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead><tr><th>Factura</th><th>Vence</th><th>Saldo</th><th>Estado</th></tr></thead>
+                        <tbody>
+                        {% for invoice in portal_pending_invoices %}
+                            <tr>
+                                <td>{{ invoice.invoice_number }}</td>
+                                <td>{{ invoice.due_date }}</td>
+                                <td>{{ invoice.balance_due }}</td>
+                                <td><span class="status-pill {% if invoice.status == 'overdue' %}status-suspended{% else %}status-pending{% endif %}">{{ invoice.get_status_display }}</span></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">No tienes facturas pendientes.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Pagos recientes</h4>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'portal-payments' %}">Ver todos</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead><tr><th>Fecha</th><th>Monto</th><th>Metodo</th><th>Referencia</th></tr></thead>
+                        <tbody>
+                        {% for payment in portal_recent_payments %}
+                            <tr>
+                                <td>{{ payment.paid_at|date:"Y-m-d H:i" }}</td>
+                                <td>{{ payment.amount }}</td>
+                                <td>{{ payment.get_method_display }}</td>
+                                <td>{{ payment.reference|default:"-" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">No tienes pagos registrados aun.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

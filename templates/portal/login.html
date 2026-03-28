@@ -1,0 +1,50 @@
+{% extends "portal/base.html" %}
+{% block title %}Iniciar sesión | QvaTel{% endblock %}
+{% block content %}
+<section class="portal-access-card">
+    <div class="portal-access-copy">
+        <span class="eyebrow">Cuenta portal</span>
+        <h1>Entra con tu correo y tu contraseña</h1>
+        <p>Si ya creaste tu cuenta del portal, aquí puedes iniciar sesión para consultar tu servicio, tus pagos y tu fecha de cobro cuando quieras.</p>
+        <ul class="portal-feature-list">
+            <li>Acceso más cómodo y permanente</li>
+            <li>Historial de pagos y facturas</li>
+            <li>Sin depender del código en cada ingreso</li>
+        </ul>
+    </div>
+    <div class="card card-soft portal-form-card">
+        <div class="card-body p-4">
+            <h3 class="mb-3">Iniciar sesión</h3>
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.email_login.id_for_label }}">{{ form.email_login.label }}</label>
+                    {{ form.email_login }}
+                    {% if form.email_login.errors %}<div class="text-danger small mt-1">{{ form.email_login.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors|join:", " }}</div>{% endif %}
+                </div>
+                {% if form.non_field_errors %}
+                    <div class="col-12">
+                        <div class="alert alert-danger mb-0">{{ form.non_field_errors }}</div>
+                    </div>
+                {% endif %}
+                <div class="col-12">
+                    <button class="btn btn-primary w-100" type="submit">Entrar</button>
+                </div>
+                <div class="col-12 text-center">
+                    <a class="text-decoration-none" href="{% url 'portal-register' %}">Crear cuenta nueva</a>
+                    <span class="text-secondary mx-2">|</span>
+                    <a class="text-decoration-none" href="{% url 'portal-access' %}">Usar acceso rápido</a>
+                </div>
+                <div class="col-12 text-center">
+                    <a class="text-decoration-none" href="{% url 'portal-recover' %}">Olvidé mi contraseña</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "portal/base.html" %}
+{% block title %}Crear cuenta | QvaTel{% endblock %}
+{% block content %}
+<section class="portal-access-card">
+    <div class="portal-access-copy">
+        <span class="eyebrow">Registro portal</span>
+        <h1>Crea tu cuenta y deja tu acceso activo</h1>
+        <p>Validamos que ya existes como cliente de QvaTel y luego te dejamos crear una cuenta propia para usar el portal cuando quieras.</p>
+        <ul class="portal-feature-list">
+            <li>Se vincula con tu ficha real de cliente</li>
+            <li>Queda visible para el personal de QvaTel</li>
+            <li>Tu correo sera tu usuario de acceso</li>
+        </ul>
+    </div>
+    <div class="card card-soft portal-form-card">
+        <div class="card-body p-4">
+            <h3 class="mb-3">Crear cuenta</h3>
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.identifier.id_for_label }}">{{ form.identifier.label }}</label>
+                    {{ form.identifier }}
+                    {% if form.identifier.errors %}<div class="text-danger small mt-1">{{ form.identifier.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="{{ form.email_login.id_for_label }}">{{ form.email_login.label }}</label>
+                    {{ form.email_login }}
+                    {% if form.email_login.errors %}<div class="text-danger small mt-1">{{ form.email_login.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.password1.id_for_label }}">{{ form.password1.label }}</label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors|join:", " }}</div>{% endif %}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="{{ form.password2.id_for_label }}">{{ form.password2.label }}</label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors|join:", " }}</div>{% endif %}
+                </div>
+                {% if form.non_field_errors %}
+                    <div class="col-12">
+                        <div class="alert alert-danger mb-0">{{ form.non_field_errors }}</div>
+                    </div>
+                {% endif %}
+                <div class="col-12">
+                    <button class="btn btn-primary w-100" type="submit">Crear mi cuenta</button>
+                </div>
+                <div class="col-12 text-center">
+                    <a class="text-decoration-none" href="{% url 'portal-login' %}">Ya tengo cuenta</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

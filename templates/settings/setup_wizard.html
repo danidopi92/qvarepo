@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+{% block title %}Asistente inicial | QvaTel{% endblock %}
+{% block page_title %}Asistente inicial{% endblock %}
+{% block content %}
+<section class="hero-panel mt-4">
+    <div>
+        <span class="eyebrow">Configuración inicial</span>
+        <h3 class="mt-3 mb-2">
+            {% if wizard_step == "welcome" %}
+                Vamos a dejar lista tu empresa paso a paso
+            {% elif wizard_step == "finish" %}
+                Cierre de la configuración inicial
+            {% else %}
+                Configuración inicial de {{ system_company.name|default:"tu empresa" }}
+            {% endif %}
+        </h3>
+        <p class="mb-0 text-secondary">
+            {% if setup_wizard.is_needed %}
+                Completa empresa, administrador inicial, usuarios, nodos y planes antes de entrar al panel operativo.
+            {% else %}
+                La empresa ya tiene la configuración base terminada. Puedes revisar el cierre del asistente y entrar al panel.
+            {% endif %}
+        </p>
+        {% if wizard_step == "welcome" %}
+        <div class="hero-actions mt-4">
+            <a class="btn btn-light btn-lg" href="{% url 'setup-wizard-step' 'company' %}">Empezar</a>
+            <a class="btn btn-outline-light btn-lg" href="{% url 'setup-wizard-step' 'company' %}">Ir al paso 1</a>
+        </div>
+        {% elif wizard_next_step and wizard_step != "finish" %}
+        <div class="hero-actions mt-4">
+            <a class="btn btn-light btn-lg" href="{% url 'setup-wizard-step' wizard_next_step %}">Siguiente paso</a>
+            {% if wizard_previous_step %}
+            <a class="btn btn-outline-light btn-lg" href="{% if wizard_previous_step == 'welcome' %}{% url 'setup-wizard' %}{% else %}{% url 'setup-wizard-step' wizard_previous_step %}{% endif %}">Volver</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="wizard-progress-card">
+        <span>Progreso requerido</span>
+        <strong>{{ setup_wizard.progress }}%</strong>
+        <small>{{ setup_wizard.completed }} de {{ setup_wizard.required_total }} pasos obligatorios completos</small>
+    </div>
+</section>
+
+<section class="card card-soft mt-4">
+    <div class="card-body">
+        <div class="wizard-progress">
+            <div class="wizard-progress-bar" style="width: {{ setup_wizard.progress }}%;"></div>
+        </div>
+        <div class="wizard-nav-grid">
+            {% for nav_step in wizard_navigation %}
+                <a class="wizard-nav-item {% if nav_step.current %}is-current{% elif nav_step.done %}is-done{% endif %}" href="{% if nav_step.slug == 'welcome' %}{% url 'setup-wizard' %}{% else %}{% url 'setup-wizard-step' nav_step.slug %}{% endif %}">
+                    <span class="wizard-nav-dot">
+                        {% if nav_step.done %}
+                            <i class="bi bi-check2"></i>
+                        {% else %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    </span>
+                    <div>
+                        <strong>{{ nav_step.title }}</strong>
+                        {% if nav_step.required %}
+                            <small>Obligatorio</small>
+                        {% elif nav_step.slug != "welcome" and nav_step.slug != "finish" %}
+                            <small>Recomendado</small>
+                        {% endif %}
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% if wizard_step == "welcome" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="card card-soft h-100">
+            <div class="card-body">
+                <h4 class="mb-3">Qué hace este asistente</h4>
+                <p class="text-secondary">Te guía desde la configuración inicial hasta dejar lista la empresa para trabajar. Primero definimos la base administrativa, luego la estructura técnica y después la carga comercial.</p>
+                <div class="wizard-bullet-grid mt-4">
+                    <div class="wizard-bullet">Empresa e identidad</div>
+                    <div class="wizard-bullet">Administrador inicial</div>
+                    <div class="wizard-bullet">Usuarios y roles</div>
+                    <div class="wizard-bullet">Nodos operativos</div>
+                    <div class="wizard-bullet">Planes de internet</div>
+                    <div class="wizard-bullet">Clientes e importaciones</div>
+                    <div class="wizard-bullet">Servicios y primer cobro</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card card-soft h-100">
+            <div class="card-body d-flex flex-column">
+                <h5 class="mb-2">Siguiente paso</h5>
+                <p class="text-secondary">Empieza configurando los datos base de la empresa. Después crearás el administrador inicial y el equipo operativo.</p>
+                <div class="mt-auto d-grid gap-2">
+                    <a class="btn btn-primary" href="{% url 'setup-wizard-step' 'company' %}">Empezar configuración</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'settings-reset' %}">Reinicio total</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% elif wizard_step == "company" %}
+<section class="card card-soft mt-4">
+    <div class="card-header">Paso 1. Empresa y parámetros base</div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" class="row g-4">
+            {% csrf_token %}
+            <div class="col-lg-6">
+                <h6 class="mb-3">Empresa</h6>
+                {% for field in company_form %}
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-lg-6">
+                <h6 class="mb-3">Facturación base</h6>
+                {% for field in system_form %}
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                        {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-12 d-flex gap-2 flex-wrap justify-content-between">
+                <a class="btn btn-outline-secondary" href="{% url 'setup-wizard' %}">Volver</a>
+                <button class="btn btn-primary" type="submit">Guardar y continuar</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% elif wizard_step == "admin" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-7">
+        <div class="card card-soft h-100">
+            <div class="card-header">Paso 2. Crea el administrador inicial</div>
+            <div class="card-body">
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+                    {% for field in admin_form %}
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="col-12 d-flex gap-2 flex-wrap justify-content-between">
+                        <a class="btn btn-outline-secondary" href="{% url 'setup-wizard-step' 'company' %}">Volver</a>
+                        <button class="btn btn-primary" type="submit">Crear administrador y continuar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card card-soft h-100">
+            <div class="card-header">Qué podrá hacer</div>
+            <div class="card-body">
+                <p class="text-secondary">Esta cuenta será la principal del sistema. Podrá entrar al panel, administrar la configuración, crear usuarios y validar toda la operación.</p>
+                <div class="wizard-bullet-grid">
+                    <div class="wizard-bullet">Acceso completo al panel</div>
+                    <div class="wizard-bullet">Gestión de usuarios</div>
+                    <div class="wizard-bullet">Ajustes e identidad</div>
+                    <div class="wizard-bullet">Facturación y reportes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% elif wizard_step == "users" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-7">
+        <div class="card card-soft h-100">
+            <div class="card-header">Paso 3. Usuarios y roles</div>
+            <div class="card-body">
+                <form method="post" class="row g-3">
+                    {% csrf_token %}
+                    {% for field in user_form %}
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="col-12 d-flex gap-2 flex-wrap justify-content-between">
+                        <a class="btn btn-outline-secondary" href="{% url 'setup-wizard-step' 'admin' %}">Volver</a>
+                        <button class="btn btn-primary" type="submit">Crear usuario y continuar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card card-soft h-100">
+            <div class="card-header">Usuarios actuales</div>
+            <div class="card-body">
+                {% for user_item in users_list %}
+                    <div class="timeline-item">
+                        <strong>{{ user_item.username }}</strong>
+                        <div class="small text-secondary">{{ user_item.email|default:"Sin correo" }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-secondary mb-0">Todavía no hay usuarios activos.</p>
+                {% endfor %}
+                <div class="mt-3 d-grid gap-2">
+                    <a class="btn btn-outline-primary" href="{% url 'settings-users' %}">Gestionar usuarios</a>
+                    {% if setup_wizard.steps_by_slug.users.done %}
+                        <a class="btn btn-primary" href="{% url 'setup-wizard-step' 'nodes' %}">Continuar al siguiente paso</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% elif wizard_step == "nodes" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-header">Paso 4. Crea tu primer nodo</div>
+            <div class="card-body">
+                <form method="post" class="vstack gap-3">
+                    {% csrf_token %}
+                    {% for field in node_form %}
+                        <div>
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2 flex-wrap justify-content-between">
+                        <a class="btn btn-outline-secondary" href="{% url 'setup-wizard-step' 'users' %}">Volver</a>
+                        <button class="btn btn-primary" type="submit">Guardar nodo y continuar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-header">O importa varios nodos</div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" class="vstack gap-3">
+                    {% csrf_token %}
+                    <div>
+                        <label class="form-label" for="{{ customer_import_form.file.id_for_label }}">Archivo Excel o CSV</label>
+                        {{ customer_import_form.file }}
+                        {% for error in customer_import_form.file.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button class="btn btn-outline-primary" type="submit">Importar nodos y continuar</button>
+                        <a class="btn btn-outline-secondary" href="{% url 'settings-nodes' %}">Ir al módulo de nodos</a>
+                    </div>
+                </form>
+                <hr>
+                {% for node in nodes_list %}
+                    <div class="timeline-item">
+                        <strong>{{ node.name }}</strong>
+                        <div class="small text-secondary">{{ node.zone|default:"Sin zona" }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-secondary mb-0">Todavía no hay nodos cargados.</p>
+                {% endfor %}
+                {% if setup_wizard.steps_by_slug.nodes.done %}
+                    <div class="mt-3 d-grid">
+                        <a class="btn btn-primary" href="{% url 'setup-wizard-step' 'plans' %}">Continuar al siguiente paso</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% elif wizard_step == "plans" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-header">Paso 5. Crea tu primer plan</div>
+            <div class="card-body">
+                <form method="post" class="vstack gap-3">
+                    {% csrf_token %}
+                    {% for field in plan_form %}
+                        <div>
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2 flex-wrap justify-content-between">
+                        <a class="btn btn-outline-secondary" href="{% url 'setup-wizard-step' 'nodes' %}">Volver</a>
+                        <button class="btn btn-primary" type="submit">Guardar plan y continuar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-header">Planes actuales</div>
+            <div class="card-body">
+                {% for plan in plans_list %}
+                    <div class="timeline-item">
+                        <strong>{{ plan.name }}</strong>
+                        <div class="small text-secondary">{{ plan.speed_label|default:"Sin velocidad" }} | {{ plan.monthly_price }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-secondary mb-0">Todavía no hay planes cargados.</p>
+                {% endfor %}
+                <div class="mt-3 d-grid gap-2">
+                    <a class="btn btn-outline-primary" href="{% url 'settings-service-plans' %}">Gestionar planes</a>
+                    {% if setup_wizard.steps_by_slug.plans.done %}
+                        <a class="btn btn-primary" href="{% url 'setup-wizard-step' 'customers' %}">Continuar al siguiente paso</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% elif wizard_step == "customers" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-header">Paso 6. Importa tus clientes</div>
+            <div class="card-body">
+                <p class="text-secondary">Puedes importar clientes ahora o dejar este paso para más tarde. El panel ya puede habilitarse con la configuración base completa.</p>
+                <form method="post" enctype="multipart/form-data" class="vstack gap-3">
+                    {% csrf_token %}
+                    <div>
+                        <label class="form-label" for="{{ customer_import_form.file.id_for_label }}">Archivo Excel o CSV</label>
+                        {{ customer_import_form.file }}
+                        {% for error in customer_import_form.file.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap justify-content-between">
+                        <a class="btn btn-outline-secondary" href="{% url 'setup-wizard-step' 'plans' %}">Volver</a>
+                        <button class="btn btn-primary" type="submit">Importar clientes y continuar</button>
+                    </div>
+                </form>
+                <div class="mt-3 d-grid gap-2">
+                    <a class="btn btn-outline-primary" href="{% url 'customer-import' %}">Abrir módulo de importación</a>
+                    <a class="btn btn-outline-primary" href="{% url 'customer-create' %}">Crear cliente manualmente</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'setup-wizard-step' 'finish' %}">Continuar sin clientes por ahora</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card card-soft h-100">
+            <div class="card-header">Clientes ya cargados</div>
+            <div class="card-body">
+                {% for customer in customers_list %}
+                    <div class="timeline-item">
+                        <strong>{{ customer.full_name }}</strong>
+                        <div class="small text-secondary">{{ customer.phone|default:"Sin teléfono" }}{% if customer.node %} | {{ customer.node.name }}{% endif %}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-secondary mb-0">Todavía no hay clientes cargados.</p>
+                {% endfor %}
+                {% if setup_wizard.steps_by_slug.customers.done %}
+                    <div class="mt-3 d-grid">
+                        <a class="btn btn-primary" href="{% url 'setup-wizard-step' 'services' %}">Continuar al siguiente paso</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% elif wizard_step == "services" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-7">
+        <div class="card card-soft h-100">
+            <div class="card-header">Paso 7. Asigna servicios</div>
+            <div class="card-body">
+                <p class="text-secondary">Este paso no bloquea la entrada al panel, pero te conviene dejar al menos un servicio cargado para probar cobros y suspensiones.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a class="btn btn-primary" href="{% url 'service-create' %}">Asignar servicio</a>
+                    <a class="btn btn-outline-primary" href="{% url 'service-list' %}">Ver servicios</a>
+                    <a class="btn btn-outline-secondary" href="{% url 'setup-wizard-step' 'billing' %}">Continuar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card card-soft h-100">
+            <div class="card-header">Servicios recientes</div>
+            <div class="card-body">
+                {% for service in services_list %}
+                    <div class="timeline-item">
+                        <strong>{{ service.customer.full_name }}</strong>
+                        <div class="small text-secondary">{{ service.plan.name }} | {{ service.monthly_price }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-secondary mb-0">Todavía no hay servicios cargados.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% elif wizard_step == "billing" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-7">
+        <div class="card card-soft h-100">
+            <div class="card-header">Paso 8. Primera facturación</div>
+            <div class="card-body">
+                <p class="text-secondary">La facturación inicial es recomendable para terminar de validar el circuito, aunque el panel ya puede habilitarse si los pasos obligatorios están completos.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a class="btn btn-primary" href="{% url 'invoice-create' %}">Crear factura</a>
+                    <form method="post" action="{% url 'invoice-generate-monthly' %}">
+                        {% csrf_token %}
+                        <button class="btn btn-outline-primary" type="submit">Generar mensual</button>
+                    </form>
+                    <a class="btn btn-outline-secondary" href="{% url 'setup-wizard-step' 'finish' %}">Ir al cierre</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card card-soft h-100">
+            <div class="card-header">Facturas recientes</div>
+            <div class="card-body">
+                {% for invoice in invoices_list %}
+                    <div class="timeline-item">
+                        <strong>{{ invoice.invoice_number }}</strong>
+                        <div class="small text-secondary">{{ invoice.customer.full_name }} | {{ invoice.total_amount }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-secondary mb-0">Todavía no hay facturas emitidas.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% elif wizard_step == "finish" %}
+<section class="row g-4 mt-2">
+    <div class="col-lg-8">
+        <div class="card card-soft h-100 {% if setup_wizard.ready_for_dashboard %}border border-success-subtle{% else %}border border-warning-subtle{% endif %}">
+            <div class="card-body">
+                {% if setup_wizard.ready_for_dashboard %}
+                    <span class="eyebrow">Listo para operar</span>
+                    <h4 class="mt-3 mb-2">La empresa ya puede entrar al panel</h4>
+                    <p class="text-secondary">La configuración obligatoria ya está completa. Desde aquí puedes pasar al acceso normal y entrar luego al panel operativo de la empresa creada.</p>
+                    {% if request.user.is_authenticated %}
+                        <a class="btn btn-success" href="{% url 'dashboard' %}">Entrar al panel</a>
+                    {% else %}
+                        <a class="btn btn-success" href="{% url 'login' %}">Ir a iniciar sesión</a>
+                    {% endif %}
+                {% else %}
+                    <span class="eyebrow">Faltan pasos obligatorios</span>
+                    <h4 class="mt-3 mb-2">Todavía no puedes cerrar la configuración inicial</h4>
+                    <p class="text-secondary">Completa primero los pasos obligatorios. Después de eso el sistema te habilitará la entrada al panel.</p>
+                    <a class="btn btn-primary" href="{% url 'setup-wizard-step' setup_wizard.next_step_slug %}">Continuar con el siguiente paso</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card card-soft h-100">
+            <div class="card-header">Estado del asistente</div>
+            <div class="card-body">
+                {% for step in setup_wizard.steps %}
+                    {% if step.required and not step.done %}
+                        <div class="timeline-item">
+                            <strong>{{ step.title }}</strong>
+                            <div class="small text-secondary">Pendiente</div>
+                        </div>
+                    {% endif %}
+                {% empty %}
+                    <p class="text-secondary mb-0">No quedan pasos obligatorios pendientes.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

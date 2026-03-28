@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Importar Clientes{% endblock %}
+{% block page_title %}Importar Clientes{% endblock %}
+{% block content %}
+<div class="card card-soft mt-4">
+    <div class="card-body">
+        <p class="text-secondary">Columnas principales de la plantilla: <code>customer_type</code>, <code>full_name</code>, <code>document_id</code>, <code>phone</code>, <code>whatsapp</code>, <code>email</code>, <code>address</code>, <code>location_reference</code>, <code>node</code>, <code>assigned_ip</code>, <code>service_plan</code>, <code>payment_day</code>, <code>preferred_payment_method</code>, <code>status</code>, <code>internal_notes</code> y <code>tags</code>.</p>
+        <p class="text-secondary small">Alias soportados: <code>dia_de_pago</code>, <code>tipo_de_pago</code>, <code>notas</code>, <code>direccion</code>, <code>telefono</code>, <code>correo</code>, <code>nodo</code> e <code>ip</code>.</p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label class="form-label">Archivo CSV o Excel</label>
+            {{ form.file }}
+            <div class="mt-3">
+                <button class="btn btn-primary" type="submit">Importar</button>
+                <a class="btn btn-outline-secondary" href="{% static 'templates/plantilla_clientes_qvatel_actual.xlsx' %}">Descargar plantilla</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
